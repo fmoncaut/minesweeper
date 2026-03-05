@@ -1,16 +1,95 @@
-cat > app/templates/index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minesweeper</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        :root {
+            --cell-size: 45px;
+            --bg-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { color: var(--bg-color); }
+
+        #status {
+            height: 30px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Grille alignée de manière rigide */
+        #board {
+            display: grid;
+            /* Le repeat(8, ...) doit correspondre à la largeur de votre grille backend */
+            grid-template-columns: repeat(8, var(--cell-size));
+            gap: 4px;
+            background-color: #95a5a6;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border: none;
+            border-radius: 4px;
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .cell:hover { background-color: #4e6a85; }
+
+        /* Style pour les cases révélées */
+        .cell.revealed {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            cursor: default;
+        }
+
+        .cell.mine { background-color: #e74c3c; }
+
+        .controls { margin-top: 20px; }
+
+        button#restart-btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
+
     <h1>💣 Minesweeper</h1>
     <div id="status"></div>
     <div id="board"></div>
-    <button onclick="restart()">🔄 Restart</button>
+
+    <div class="controls">
+        <button id="restart-btn" onclick="restart()">🔄 Restart Game</button>
+    </div>
 
     <script>
         async function loadBoard() {
@@ -23,18 +102,30 @@ cat > app/templates/index.html << 'EOF'
             const div = document.getElementById('board');
             const status = document.getElementById('status');
             div.innerHTML = '';
+
             if (winner) {
                 status.textContent = '🎉 You Win!';
+                status.style.color = '#27ae60';
             }
+
             board.forEach((row, r) => {
                 row.forEach((cell, c) => {
                     const btn = document.createElement('button');
                     btn.className = 'cell';
-                    btn.textContent = cell === '' ? '' : cell;
+
+                    // LOGIQUE DE RÉVÉLATION
+                    // On n'affiche le texte que si la case n'est pas "vide" (cachée)
+                    if (cell !== "" && cell !== null) {
+                        btn.textContent = cell;
+                        btn.classList.add('revealed');
+                        if (cell === 'M') btn.classList.add('mine');
+                    } else {
+                        btn.textContent = ''; // Case cachée
+                    }
+
                     btn.onclick = () => reveal(r, c);
                     div.appendChild(btn);
                 });
-                div.appendChild(document.createElement('br'));
             });
         }
 
@@ -46,8 +137,10 @@ cat > app/templates/index.html << 'EOF'
             });
             const data = await res.json();
             const status = document.getElementById('status');
+
             if (data.result === 'Game Over') {
                 status.textContent = '💥 Game Over!';
+                status.style.color = '#e74c3c';
             }
             renderBoard(data.board, data.winner);
         }
@@ -59,8 +152,8 @@ cat > app/templates/index.html << 'EOF'
             renderBoard(data.board, false);
         }
 
+        // Initialisation au chargement
         loadBoard();
     </script>
 </body>
 </html>
-EOF
