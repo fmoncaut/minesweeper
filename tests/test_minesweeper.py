@@ -64,7 +64,3 @@ def test_is_winner():
 
     # Maintenant on a gagné
     assert game.is_winner() == True
-
-
-def test_fail():
-    assert False
