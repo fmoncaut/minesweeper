@@ -34,6 +34,7 @@ class Minesweeper:
     def reveal(self, row: int, col: int) -> str:
         """Reveal a cell on the board."""
         if (row, col) in self.mines:
+            self.revealed.add((row, col))  # ← ajouter cette ligne
             return "Game Over"
         self.revealed.add((row, col))
         if self.board[row][col] == 0:
