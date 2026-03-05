@@ -1,4 +1,3 @@
-cat > app/static/styles.css << 'EOF'
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -54,4 +53,3 @@ button:last-of-type {
 button:last-of-type:hover {
     background-color: #1f5a9e;
 }
-EOF
