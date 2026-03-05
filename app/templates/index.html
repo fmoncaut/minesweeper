@@ -1,0 +1,66 @@
+cat > app/templates/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>💣 Minesweeper</h1>
+    <div id="status"></div>
+    <div id="board"></div>
+    <button onclick="restart()">🔄 Restart</button>
+
+    <script>
+        async function loadBoard() {
+            const res = await fetch('/board');
+            const data = await res.json();
+            renderBoard(data.board, data.winner);
+        }
+
+        function renderBoard(board, winner) {
+            const div = document.getElementById('board');
+            const status = document.getElementById('status');
+            div.innerHTML = '';
+            if (winner) {
+                status.textContent = '🎉 You Win!';
+            }
+            board.forEach((row, r) => {
+                row.forEach((cell, c) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'cell';
+                    btn.textContent = cell === '' ? '' : cell;
+                    btn.onclick = () => reveal(r, c);
+                    div.appendChild(btn);
+                });
+                div.appendChild(document.createElement('br'));
+            });
+        }
+
+        async function reveal(row, col) {
+            const res = await fetch('/reveal', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({row, col})
+            });
+            const data = await res.json();
+            const status = document.getElementById('status');
+            if (data.result === 'Game Over') {
+                status.textContent = '💥 Game Over!';
+            }
+            renderBoard(data.board, data.winner);
+        }
+
+        async function restart() {
+            const res = await fetch('/restart', {method: 'POST'});
+            const data = await res.json();
+            document.getElementById('status').textContent = '';
+            renderBoard(data.board, false);
+        }
+
+        loadBoard();
+    </script>
+</body>
+</html>
+EOF
