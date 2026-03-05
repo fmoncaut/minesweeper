@@ -1,4 +1,5 @@
-""" This module implements the Minesweeper game. """
+"""This module implements the Minesweeper game."""
+
 import random
 
 
@@ -13,22 +14,25 @@ class Minesweeper:
         self.place_mines()
 
     def place_mines(self):
-        """ Randomly place mines on the board, updating adjacent cells with mine counts. """
+        """Randomly place mines on the board, updating adjacent cells with mine counts."""
         all_positions = [(r, c) for r in range(self.rows) for c in range(self.cols)]
         self.mines = set(random.sample(all_positions, self.num_mines))
-        for (r, c) in self.mines:
+        for r, c in self.mines:
             self.board[r][c] = "M"
             for dr in [-1, 0, 1]:
                 for dc in [-1, 0, 1]:
                     nr, nc = r + dr, c + dc
-                    if (0 <= nr < self.rows and 0 <= nc < self.cols
-                            and (nr, nc) not in self.mines):
+                    if (
+                        0 <= nr < self.rows
+                        and 0 <= nc < self.cols
+                        and (nr, nc) not in self.mines
+                    ):
                         if self.board[nr][nc] == "":
                             self.board[nr][nc] = 0
                         self.board[nr][nc] += 1
 
     def reveal(self, row: int, col: int) -> str:
-        """ Reveal a cell on the board. """
+        """Reveal a cell on the board."""
         if (row, col) in self.mines:
             return "Game Over"
         self.revealed.add((row, col))
@@ -36,19 +40,22 @@ class Minesweeper:
             for dr in [-1, 0, 1]:
                 for dc in [-1, 0, 1]:
                     nr, nc = row + dr, col + dc
-                    if (0 <= nr < self.rows and 0 <= nc < self.cols
-                            and (nr, nc) not in self.revealed):
+                    if (
+                        0 <= nr < self.rows
+                        and 0 <= nc < self.cols
+                        and (nr, nc) not in self.revealed
+                    ):
                         self.reveal(nr, nc)
         return "Continue"
 
     def get_board(self) -> list:
-        """ Return the current state of the board. """
+        """Return the current state of the board."""
         return self.board
 
     def is_winner(self) -> bool:
-        """ Check if the game has been won. """
+        """Check if the game has been won."""
         return len(self.revealed) == (self.rows * self.cols) - self.num_mines
 
     def restart(self) -> None:
-        """ Restart the game with the same parameters. """
+        """Restart the game with the same parameters."""
         self.__init__(self.rows, self.cols, self.num_mines)
