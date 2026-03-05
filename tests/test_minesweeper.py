@@ -42,9 +42,16 @@ def test_get_board():
     assert len(board) == 3
     # Chaque ligne a 3 colonnes
     assert len(board[0]) == 3
-    # Les mines sont marquées "M"
+
+    # TEST DE SÉCURITÉ : Les mines doivent être MASQUÉES (chaîne vide) au départ
     for r, c in game.mines:
-        assert board[r][c] == "M"
+        assert board[r][c] == ""
+
+    # TEST DE RÉVÉLATION : Si on révèle une mine, elle doit alors apparaître
+    mine_r, mine_c = next(iter(game.mines))
+    game.reveal(mine_r, mine_c)
+    board_after = game.get_board()
+    assert board_after[mine_r][mine_c] == "M"
 
 
 def test_is_winner():
