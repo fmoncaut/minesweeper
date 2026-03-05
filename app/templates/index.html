@@ -110,23 +110,24 @@
 
             board.forEach((row, r) => {
                 row.forEach((cell, c) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'cell';
+                const btn = document.createElement('button');
+                btn.className = 'cell';
 
-                    // LOGIQUE DE RÉVÉLATION
-                    // On n'affiche le texte que si la case n'est pas "vide" (cachée)
-                    if (cell !== "" && cell !== null) {
-                        btn.textContent = cell;
-                        btn.classList.add('revealed');
-                        if (cell === 'M') btn.classList.add('mine');
-                    } else {
-                        btn.textContent = ''; // Case cachée
-                    }
+                // Si la case est vide ou null dans l'objet JSON envoyé par le serveur,
+                // on n'affiche rien du tout sur le bouton.
+                if (cell !== "" && cell !== null && cell !== undefined) {
+                    btn.textContent = cell;
+                    btn.classList.add('revealed');
+                    if (cell === 'M') btn.classList.add('mine');
+                } else {
+                    btn.textContent = ""; // ON FORCE LE VIDE ICI
+                    btn.classList.remove('revealed');
+                }
 
-                    btn.onclick = () => reveal(r, c);
-                    div.appendChild(btn);
-                });
+                btn.onclick = () => reveal(r, c);
+                div.appendChild(btn);
             });
+        });
         }
 
         async function reveal(row, col) {

@@ -49,8 +49,13 @@ class Minesweeper:
         return "Continue"
 
     def get_board(self) -> list:
-        """Return the current state of the board."""
-        return self.board
+        """Return the board as seen by the player (hidden cells are empty strings)."""
+        visible_board = [["" for _ in range(self.cols)] for _ in range(self.rows)]
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if (r, c) in self.revealed:
+                    visible_board[r][c] = self.board[r][c]
+        return visible_board
 
     def is_winner(self) -> bool:
         """Check if the game has been won."""
